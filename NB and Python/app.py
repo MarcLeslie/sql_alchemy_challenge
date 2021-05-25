@@ -62,13 +62,13 @@ def Measurement():
     results = session.query(measurements.date, measurements.prcp).all()
 
     session.close()
-
+    ####################### YOU NEED TO LIMIT THIS DATE TO JUST ONE YEAR #########################
     # Create a dictionary from the row data and append to a list
     all_precip = []
     for date, prcp in results:
         all_precip_dict = {}
-        all_precip_dict["date"] = date
-        all_precip_dict["prcp"] = prcp
+        all_precip_dict[date] = prcp
+        #all_precip_dict["prcp"] = prcp
         all_precip.append(all_precip_dict)
 
     return jsonify(all_precip)
