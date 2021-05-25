@@ -11,7 +11,7 @@ from flask import Flask, jsonify
 # Database Setup CHANGE WHERE THE DATABASE POINTS TO
 #################################################
 
-engine = create_engine("sqlite:///./Resources/hawaii.sqlite")
+engine = create_engine("sqlite:///../Resources/hawaii.sqlite")
 
 
 # reflect an existing database into a new model
@@ -45,31 +45,72 @@ def welcome():
         f"/api/v1.0/start/end<br/>"
     )
 
-
+# #################################################
+# # DONT CHANGE ANYTHING ABOVE THIS
+# #################################################
     
-################CHANGE SHIT UP HERE AND LOOK AT HW TO CHANGE THIS SHIT UP  THEN COPY AND MODIFY SHIT TO MEET THE REQUIREMENTS##############
+################ PRECIP ##############
+# Convert query results to a dict using date as key and prcp as value
+# Return the json rep of the dict
+
 @app.route("/api/v1.0/precipitation")
-def passengers():
+def Measurement():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of passenger data including the name, age, and sex of each passenger"""
-    # Query all passengers
-    results = session.query(Passenger.name, Passenger.age, Passenger.sex).all()
+    # Query all 
+    results = session.query(measurements.date, measurements.prcp).all()
 
     session.close()
 
-    # Create a dictionary from the row data and append to a list of all_passengers
-    all_passengers = []
-    for name, age, sex in results:
-        passenger_dict = {}
-        passenger_dict["name"] = name
-        passenger_dict["age"] = age
-        passenger_dict["sex"] = sex
-        all_passengers.append(passenger_dict)
+    # Create a dictionary from the row data and append to a list
+    all_precip = []
+    for date, prcp in results:
+        all_precip_dict = {}
+        all_precip_dict["date"] = date
+        all_precip_dict["prcp"] = prcp
+        all_precip.append(all_precip_dict)
 
-    return jsonify(all_passengers)
+    return jsonify(all_precip)
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+################THIS IS A TEMPLATE ##############
+################# DELETE THIS WHEN DONE ##############
+# @app.route("/api/v1.0/precipitation")
+# def passengers():
+#     # Create our session (link) from Python to the DB
+#     session = Session(engine)
+
+#     """Return a list of passenger data including the name, age, and sex of each passenger"""
+#     # Query all passengers
+#     results = session.query(Passenger.name, Passenger.age, Passenger.sex).all()
+
+#     session.close()
+
+#     # Create a dictionary from the row data and append to a list of all_passengers
+#     all_passengers = []
+#     for name, age, sex in results:
+#         passenger_dict = {}
+#         passenger_dict["name"] = name
+#         passenger_dict["age"] = age
+#         passenger_dict["sex"] = sex
+#         all_passengers.append(passenger_dict)
+
+#     return jsonify(all_passengers)
+
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
