@@ -1,7 +1,7 @@
 import numpy as np
 import sqlalchemy
 import os 
-
+import datetime as dt
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
@@ -54,25 +54,21 @@ def welcome():
 # Return the json rep of the dict
 
 @app.route("/api/v1.0/precipitation")
-def Measurement():
-    # Create our session (link) from Python to the DB
+def precipitation():
     session = Session(engine)
-
-    # Query all 
-    results = session.query(measurements.date, measurements.prcp).all()
-
+    last_date = session.query(measurements.date).order_by(measurements.date.desc()).first()
+    year_ago = dt.datetime.strptime(str(last_date[0]), "%Y-%m-%d") - dt.timedelta(days=365)
+    year_limit = session.query(measurements.date, measurements.prcp).filter(measurements.date >= year_ago).order_by(measurements.date).all()
     session.close()
-    ####################### YOU NEED TO LIMIT THIS DATE TO JUST ONE YEAR #########################
+       
     # Create a dictionary from the row data and append to a list
     all_precip = []
-    for date, prcp in results:
+    for date, prcp in year_limit:
         all_precip_dict = {}
         all_precip_dict[date] = prcp
-        #all_precip_dict["prcp"] = prcp
         all_precip.append(all_precip_dict)
 
     return jsonify(all_precip)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
