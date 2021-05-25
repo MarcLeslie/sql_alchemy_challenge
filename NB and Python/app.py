@@ -68,15 +68,30 @@ def precipitation():
         all_precip_dict[date] = prcp
         all_precip.append(all_precip_dict)
 
-    return jsonify(all_precip)
+    return jsonify(all_precip) #### this is the final step of the method that started with def precipitaiton(): ####
 
+
+########### ALL STATIONS ####################
+@app.route("/api/v1.0/stations")
+def stations2():
+    session = Session(engine)
+    results = session.query(stations.name, stations.station).all()
+    session.close()
+
+    all_stations=[]
+
+    for name, station in results:
+        all_stations_dict={}
+        all_stations_dict[name] = station 
+        all_stations.append(all_stations_dict)
+
+
+
+    return jsonify(all_stations)
+
+#THIS GOES AT THE VERY, VERY END!  IF NOT IT WILL TERMINATE THE API OR WHATEVER IT IS EARLY
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
 
 
 
