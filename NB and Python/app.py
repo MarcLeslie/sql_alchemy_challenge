@@ -89,10 +89,43 @@ def stations2():
 
     return jsonify(all_stations)
 
+
+
+
+############ MOST ACTIVE #########################
+######### DATES AND TEMP OF MOST ACTIVE STATION FOR THE LAST YEAR OF DATA  ############
+######### JSON LIST OF TOBS FOR THE PRIOR YEAR ########################################
+
+@app.route("/api/v1.0/tobs")
+def toby_mcguire():
+    session = Session(engine)
+    most_active = session.query(measurements.date).filter(measurements.station == "USC00519281").order_by(measurements.date.desc()).first()
+    last_date = session.query(measurements.date).filter(measurements.station == "USC00519281").order_by(measurements.date.desc()).first()
+    year_ago2 = dt.datetime.strptime(str(last_date[0]), "%Y-%m-%d") - dt.timedelta(days=365)
+    year_limit = session.query(measurements.date, measurements.prcp).filter(measurements.date >= year_ago2).order_by(measurements.date).all()
+    session.close()
+
+     ########
+       
+    
+    so_very_active = []
+    for date, prcp in year_limit:
+        so_very_active_dict = {}
+        so_very_active_dict[date] = prcp
+        so_very_active.append(so_very_active_dict)
+
+    return jsonify(so_very_active) #### this is the final step of the method that started with def precipitaiton(): ####
+
+
+
+
+
+
+
+
 #THIS GOES AT THE VERY, VERY END!  IF NOT IT WILL TERMINATE THE API OR WHATEVER IT IS EARLY
 if __name__ == '__main__':
     app.run(debug=True)
-
 
 
 
