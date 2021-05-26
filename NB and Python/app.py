@@ -39,7 +39,7 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/&lt;start&gt;<br/>"
+        #f"/api/v1.0/&lt;start&gt;<br/>" #ACCORDING TO ASK BCS
         f"/api/v1.0/&lt;start&gt;/&lt;end&gt;<br/>"
     )
 
