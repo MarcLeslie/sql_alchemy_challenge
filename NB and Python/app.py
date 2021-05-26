@@ -13,7 +13,6 @@ from flask import Flask, jsonify
 
 engine = create_engine("sqlite:///../Resources/hawaii.sqlite")
 
-
 # reflect an existing database into a new model
 Base = automap_base()
 # # reflect the tables
@@ -27,7 +26,6 @@ stations = Base.classes.station
 # # Flask Setup
 # #################################################
 app = Flask(__name__)
-
 
 # #################################################
 # # Flask Routes DONT CHANGE ANYTHING ABOVE THIS
@@ -70,7 +68,6 @@ def precipitation():
 
     return jsonify(all_precip) #### this is the final step of the method that started with def precipitaiton(): ####
 
-
 ########### ALL STATIONS ####################
 @app.route("/api/v1.0/stations")
 def stations2():
@@ -85,29 +82,19 @@ def stations2():
         all_stations_dict[name] = station 
         all_stations.append(all_stations_dict)
 
-
-
     return jsonify(all_stations)
 
-
-
-
 ############ MOST ACTIVE #########################
-######### DATES AND TEMP OF MOST ACTIVE STATION FOR THE LAST YEAR OF DATA  ############
-######### JSON LIST OF TOBS FOR THE PRIOR YEAR ########################################
+# date/temp of most active for last year 
 
 @app.route("/api/v1.0/tobs")
-def toby_mcguire():
+def tobias_funke():
     session = Session(engine)
     most_active = session.query(measurements.date).filter(measurements.station == "USC00519281").order_by(measurements.date.desc()).first()
-    last_date = session.query(measurements.date).filter(measurements.station == "USC00519281").order_by(measurements.date.desc()).first()
-    year_ago2 = dt.datetime.strptime(str(last_date[0]), "%Y-%m-%d") - dt.timedelta(days=365)
+    year_ago2 = dt.datetime.strptime(str(most_active[0]), "%Y-%m-%d") - dt.timedelta(days=365)
     year_limit = session.query(measurements.date, measurements.prcp).filter(measurements.date >= year_ago2).order_by(measurements.date).all()
     session.close()
-
-     ########
        
-    
     so_very_active = []
     for date, prcp in year_limit:
         so_very_active_dict = {}
@@ -115,6 +102,34 @@ def toby_mcguire():
         so_very_active.append(so_very_active_dict)
 
     return jsonify(so_very_active) #### this is the final step of the method that started with def precipitaiton(): ####
+
+############ START ROUTE ###############
+# Route accepts the start date as a parameter from the URL
+# Returns min, max, and avg temp calculated from given start date to end of the dataset
+@app.route("/api/v1.0/<start>")
+def whatever(start=None):
+    session = Session(engine)
+    results = session.query(stations.name, stations.station, measurements.date).filter(measurements.date > start).all()
+    session.close()
+
+    cats=[]
+
+    for name, station, date in results:
+        cats_dict={}
+        cats_dict[date] = station, name 
+        cats.append(cats_dict)
+
+    return jsonify(cats)
+
+
+
+
+
+
+############# START/END ROUTE ##############
+# Route accepts the start and end dates as parameters from the URL
+# Returns min, max, and avg temp calculated from given start date to end of the dataset
+#@app.route("/api/v1.0/start/end")
 
 
 
