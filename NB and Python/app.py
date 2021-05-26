@@ -40,7 +40,7 @@ def welcome():
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
         f"/api/v1.0/&lt;start&gt;<br/>"
-        f"/api/v1.0/start/end<br/>"
+        f"/api/v1.0/&lt;start&gt;/&lt;end&gt;<br/>"
     )
 
 # #################################################
@@ -107,19 +107,34 @@ def tobias_funke():
 # Route accepts the start date as a parameter from the URL
 # Returns min, max, and avg temp calculated from given start date to end of the dataset
 @app.route("/api/v1.0/<start>")
-def whatever(start=None):
+@app.route("/api/v1.0/<start>/<end>")
+def whatever(start=None, end=None):
     session = Session(engine)
-    results = session.query(stations.name, stations.station, measurements.date).filter(measurements.date > start).all()
-    session.close()
+    sel = [func.min(measurements.tobs), func.avg(measurements.tobs), func.max(measurements.tobs)]
+    if not end:
+       results = session.query(*sel).\
+       filter(measurements.date <= start).all()
+       temps = list(np.ravel(results))
+       return jsonify(temps)
 
-    cats=[]
+    results = session.query(*sel).\
+    filter(measurements.date >= start).\
+    filter(measurements.date <= end).all()
+    temps = list(np.ravel(results))
 
-    for name, station, date in results:
-        cats_dict={}
-        cats_dict[date] = station, name 
-        cats.append(cats_dict)
+    return jsonify(temps=temps)
+    # session = Session(engine)
+    # results = session.query(stations.name, stations.station, measurements.date).filter(measurements.date >= start).all()
+    # session.close()
 
-    return jsonify(cats)
+    # cats=[]
+
+    # for name, station, date in results:
+    #     cats_dict={}
+    #     cats_dict[date] = station, name 
+    #     cats.append(cats_dict)
+
+    # return jsonify(cats)
 
 
 
